@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mars Rover Carousel</title>
+  </head>
+  <body>
+    <header>
+      <h1>Mars Rover Carousel</h1>
+    </header>
+    <main>
+      <div id="roverSelection">
+        <label for="selectRover">Select a Mars-Rover:</label>
+        <select name="selectRover" id="selectRover">
+          <option value="none" disabled selected>Select a Rover</option>
+        </select>
+        <div id="manifests"></div>
+      </div>
+
+      <div id="photos"></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

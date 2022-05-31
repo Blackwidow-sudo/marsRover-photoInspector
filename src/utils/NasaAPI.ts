@@ -1,4 +1,5 @@
 import { CamAbbr, Photo, RoverManifest, RoverName } from "../types";
+import { isArrOfPhotos, isManifest } from "./typeGuards";
 
 export default class NasaAPI {
     private static _apiKey = "api_key=DEMO_KEY";
@@ -16,7 +17,12 @@ export default class NasaAPI {
                 this._manifestsUrl.concat(...reqParams)
             );
             const data = await response.json();
-            return data.photo_manifest;
+
+            if (!isManifest(data.response)) {
+                throw new Error("NASA-API didn't return a Manifest.")
+            }
+
+            return data.photo_manifest as RoverManifest;
         } catch (err: unknown) {
             throw err;
         }
@@ -46,7 +52,11 @@ export default class NasaAPI {
             const response = await fetch(this._roversUrl.concat(...reqParams));
             const data = await response.json();
 
-            return data.photos;
+            if (!isArrOfPhotos(data.photos)) {
+                throw new Error("NASA-API didn't return an Array of Photos.")
+            }
+
+            return data.photos as Photo[];
         } catch (err: unknown) {
             throw err;
         }

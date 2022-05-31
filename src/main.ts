@@ -1,7 +1,7 @@
 import "./style.scss";
 
-import { roverNames, cameraNames } from "./globals";
-import { CamAbbr, RoverName } from "./types";
+import { roverNames } from "./globals";
+import { RoverName } from "./types";
 
 // Components
 import MissionManifest from "./components/MissionManifest";

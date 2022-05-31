@@ -51,7 +51,15 @@ interface Photo {
     rover: Rover;
 }
 
+interface UserInputs {
+    solOrDate: number | string
+    pages: number
+    camera: CamAbbr
+}
+
 type RoverPhotos = Photo[];
+
+type DateString = string
 
 export {
     RoverName,
@@ -62,4 +70,6 @@ export {
     Camera,
     Rover,
     AvailableCams,
+    UserInputs,
+    DateString,
 };

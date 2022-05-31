@@ -1,5 +1,5 @@
-import { CamAbbr, RoverName } from "../types";
-import { cameraNames } from "../globals";
+import { RoverName } from "../types";
+import { availableCams, cameraDescriptions } from "../globals";
 
 const template = document.createElement("template");
 template.innerHTML = `
@@ -49,10 +49,10 @@ template.innerHTML = `
         <label for="byDate">By Earth date</label>
         <input type="date" id="byDate" />
         <label for="pages">Pages (25 Items per page):</label>
-        <input type="number" id="pages" />
+        <input type="number" id="pages" value="1" />
         <label for="cameras">Select a Camera:</label>
         <select name="cameras" id="cameras">
-            <option value="none" disabled slected>Select Camera</option>
+            <option value="none" disabled selected>Select Camera</option>
         </select>
         <input type="button" value="Search Photos" id="search" />
     </div>
@@ -69,20 +69,42 @@ export default class RoverForm extends HTMLElement {
         this.shadowRoot!.appendChild(template.content.cloneNode(true));
     }
 
-    // TODO: Create type for availableCameras
-    private _populateSelectEl(/* availableCameras: Object */) {
-        for (const [key, val] of Object.entries(availableCameras)) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.title = val;
-            option.textContent = key;
+    private _configureInputElements() {
+        /**
+         * TODO:
+         * set min/max value for Sol
+         * set min/max value for Date
+         * set max value for Pages
+         */ 
+    }
 
-            this.shadowRoot!.querySelector("#cameras")!.appendChild(option);
-        }
+    private _populateSelectEl() {
+        const avblCams = availableCams[this._roverName.toLowerCase()]
+
+        avblCams.forEach(cam => {
+            const option = document.createElement("option")
+            option.title = cameraDescriptions[cam]
+            option.value = cam
+            option.textContent = cam
+
+            this.shadowRoot!.querySelector("#cameras")!.appendChild(option)
+        })
+    }
+
+    private _handleSubmit(e: Event) {
+        
     }
 
     connectedCallback() {
-        this._populateSelectEl(cameraNames);
+        this._populateSelectEl();
+
+        const sbmtBtn = this.shadowRoot!.querySelector("#search") as HTMLInputElement
+
+        sbmtBtn.addEventListener("click", this._handleSubmit)
+    }
+
+    disconnectedCallback() {
+        this.shadowRoot!.querySelector("#search")!.removeEventListener("click", this._handleSubmit)
     }
 }
 

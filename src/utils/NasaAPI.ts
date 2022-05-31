@@ -18,8 +18,8 @@ export default class NasaAPI {
             );
             const data = await response.json();
 
-            if (!isManifest(data.response)) {
-                throw new Error("NASA-API didn't return a Manifest.")
+            if (!isManifest(data.photo_manifest)) {
+                throw new Error("NASA-API didn't return a Manifest.");
             }
 
             return data.photo_manifest as RoverManifest;
@@ -53,7 +53,7 @@ export default class NasaAPI {
             const data = await response.json();
 
             if (!isArrOfPhotos(data.photos)) {
-                throw new Error("NASA-API didn't return an Array of Photos.")
+                throw new Error("NASA-API didn't return an Array of Photos.");
             }
 
             return data.photos as Photo[];

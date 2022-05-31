@@ -1,5 +1,5 @@
 import RoverForm from "./RoverForm";
-import { RoverManifest, RoverName } from "../types";
+import { RoverInformation, RoverManifest, RoverName } from "../types";
 import NasaAPI from "../utils/NasaAPI";
 
 const DEBUGMODE: boolean = true;
@@ -57,9 +57,7 @@ export default class MissionManifest extends HTMLElement {
         const name = this.name.toLowerCase();
         let manifest: RoverManifest;
 
-        const storedManifest = window.sessionStorage.getItem(
-            `${name}-manifest`
-        );
+        const storedManifest = window.sessionStorage.getItem(`${name}-manifest`);
 
         if (storedManifest) {
             DEBUGMODE && console.log("Returning Manifest from sessionStorage");
@@ -84,15 +82,22 @@ export default class MissionManifest extends HTMLElement {
 
     private _populateTable() {
         // create the Heading
-        const h3 = this.shadowRoot!.querySelector(
-            "#roverName"
-        ) as HTMLHeadingElement;
+        const h3 = this.shadowRoot!.querySelector("#roverName") as HTMLHeadingElement;
         h3.textContent = this._roverName;
 
         // Populate table
         this._getManifest()
             .then((manifest) => {
                 DEBUGMODE && console.log(manifest);
+
+                this.shadowRoot!.appendChild(
+                    new RoverForm({
+                        name: manifest.name,
+                        landing_date: manifest.landing_date,
+                        max_date: manifest.max_date,
+                        max_sol: manifest.max_sol,
+                    })
+                );
 
                 for (const [key, value] of Object.entries(manifest)) {
                     if (key === "photos" || key === "name") {
@@ -101,12 +106,10 @@ export default class MissionManifest extends HTMLElement {
                         // Rest goes into Table
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
-                        <th>${key.replace("_", " ")}</th>
-                        <td>${value}</td>
-                    `;
-                        this.shadowRoot!.querySelector("tbody")!.appendChild(
-                            tr
-                        );
+                            <th>${key.replace("_", " ")}</th>
+                            <td>${value}</td>
+                        `;
+                        this.shadowRoot!.querySelector("tbody")!.appendChild(tr);
                     }
                 }
             })
@@ -115,7 +118,6 @@ export default class MissionManifest extends HTMLElement {
 
     connectedCallback() {
         this._populateTable();
-        this.shadowRoot!.appendChild(new RoverForm(this.name));
     }
 }
 

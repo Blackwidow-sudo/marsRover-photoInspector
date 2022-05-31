@@ -12,12 +12,15 @@ type CamAbbr =
     | "PANCAM"
     | "MINITES";
 
-interface RoverManifest {
+interface RoverInformation {
     landing_date: string;
-    launch_date: string;
     max_date: string;
     max_sol: number;
     name: RoverName;
+}
+
+interface RoverManifest extends RoverInformation {
+    launch_date: string;
     photos: object[];
     status: Status;
     total_photos: number;
@@ -52,18 +55,19 @@ interface Photo {
 }
 
 interface UserInputs {
-    solOrDate: number | string
-    pages: number
-    camera: CamAbbr
+    solOrDate: number | string;
+    pages: number;
+    camera: CamAbbr;
 }
 
 type RoverPhotos = Photo[];
 
-type DateString = string
+type DateString = string;
 
 export {
     RoverName,
     CamAbbr,
+    RoverInformation,
     RoverManifest,
     Photo,
     RoverPhotos,

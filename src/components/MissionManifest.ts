@@ -1,4 +1,4 @@
-import RoverForm from "./RoverForm";
+import PhotoForm from "./PhotoForm";
 import { RoverInformation, RoverManifest, RoverName } from "../types";
 import NasaAPI from "../utils/NasaAPI";
 
@@ -91,7 +91,7 @@ export default class MissionManifest extends HTMLElement {
                 DEBUGMODE && console.log(manifest);
 
                 this.shadowRoot!.appendChild(
-                    new RoverForm({
+                    new PhotoForm({
                         name: manifest.name,
                         landing_date: manifest.landing_date,
                         max_date: manifest.max_date,

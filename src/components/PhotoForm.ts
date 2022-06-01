@@ -41,29 +41,14 @@ template.innerHTML = `
             cursor: pointer;
             background-color: #91e5b7;
         }
+
+        #day {
+            width: 100%;
+        }
     </style>
 
     <h4>Search Photos</h4>
     <div id="searchForm">
-        <!--
-        <div id="chooseSolOrDate">
-            <label for="sol">
-                <input type="radio" name="solOrDate" value="sol" id="sol" checked />
-                By Martian sol
-            </label>
-            <label for="date">
-                <input type="radio" name="solOrDate" value="date" id="date" />
-                By Earth date
-            </label>
-        </div>
-
-        <label for="bySol">By Martian sol:</label>
-        <input type="number" id="bySol" min="0" />
-
-        <label for="byDate">By Earth date</label>
-        <input type="date" id="byDate" />
-        -->
-
         <div id="dayPicker">
             <div id="radioGroup">
                 <label for="bySol">
@@ -91,7 +76,7 @@ template.innerHTML = `
     </div>
 `;
 
-export default class RoverForm extends HTMLElement {
+export default class PhotoForm extends HTMLElement {
     private _roverInfo: RoverInformation;
 
     constructor(roverInfo: RoverInformation) {
@@ -111,25 +96,21 @@ export default class RoverForm extends HTMLElement {
     }
 
     connectedCallback() {
-        this._initInputs();
+        this._initForm();
     }
 
     disconnectedCallback() {}
 
-    private _initInputs() {
+    private _initForm() {
+        this._initDayInput();
+
         // Set min/max values for sol/day input
         const radioGroup = this.shadowRoot!.querySelector(
             "#radioGroup"
         ) as HTMLDivElement;
-        radioGroup.addEventListener("change", (e: Event) => {
-            const clickedElem = e.target as HTMLInputElement;
 
-            if (clickedElem.value === "date") {
-                this._changeDayInputType("date");
-            } else {
-                this._changeDayInputType("sol");
-            }
-        });
+        // Important to bind the Web-Component as "this" to the eventHandler
+        radioGroup.addEventListener("change", this._handleRadio.bind(this));
 
         // Populate Camera-Selector
         const availCams = availableCams[this.name.toLowerCase()];
@@ -142,6 +123,23 @@ export default class RoverForm extends HTMLElement {
 
             this.shadowRoot!.querySelector("#cameras")!.appendChild(option);
         });
+
+        // Important to bind the Web-Component as "this" to the eventHandler
+        (this.shadowRoot!.querySelector("#search") as HTMLInputElement).addEventListener(
+            "click",
+            this._handleSubmit.bind(this)
+        );
+    }
+
+    private _initDayInput() {
+        const dayInput = this.shadowRoot!.querySelector("#day") as HTMLInputElement;
+
+        (this.shadowRoot!.querySelector("#bySol") as HTMLInputElement)!.checked = true;
+
+        dayInput.type = "number";
+        dayInput.placeholder = this.rover.max_sol.toString();
+        dayInput.min = "0";
+        dayInput.max = this.rover.max_sol.toString();
     }
 
     private _changeDayInputType(to: "sol" | "date") {
@@ -157,6 +155,21 @@ export default class RoverForm extends HTMLElement {
             dayInput.max = this.rover.max_sol.toString();
         }
     }
+
+    private _handleRadio(e: Event) {
+        const clickedElem = e.target as HTMLInputElement;
+
+        if (clickedElem.value === "date") {
+            this._changeDayInputType("date");
+        } else {
+            this._changeDayInputType("sol");
+        }
+    }
+
+    private _handleSubmit(e: Event) {
+        const clickedElem = e.target;
+        console.log(clickedElem);
+    }
 }
 
-window.customElements.define("rover-form", RoverForm);
+window.customElements.define("photo-form", PhotoForm);

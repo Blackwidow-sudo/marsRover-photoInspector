@@ -1,10 +1,11 @@
-import PhotoForm from "./PhotoForm";
-import { RoverInformation, RoverManifest, RoverName } from "../types";
-import NasaAPI from "../utils/NasaAPI";
+import PhotoForm from './PhotoForm';
+import { RoverInformation, RoverManifest, RoverName } from '../types';
+import NasaAPI from '../utils/NasaAPI';
+import { isManifest } from '../utils/typeGuards';
 
 const DEBUGMODE: boolean = true;
 
-const template = document.createElement("template");
+const template = document.createElement('template');
 template.innerHTML = `
     <style>
         :host {
@@ -45,12 +46,62 @@ export default class MissionManifest extends HTMLElement {
         super();
 
         this._roverName = roverName;
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({ mode: 'open' });
         this.shadowRoot!.appendChild(template.content.cloneNode(true));
     }
 
     public get name() {
         return this._roverName;
+    }
+
+    connectedCallback() {
+        this._populateTable();
+    }
+
+    private _populateTable() {
+        const h3 = this.shadowRoot!.querySelector('#roverName') as HTMLHeadingElement;
+        const tbody = this.shadowRoot!.querySelector('tbody') as HTMLTableSectionElement;
+
+        // create the Heading
+        h3.textContent = this._roverName;
+
+        // Populate table
+        this._getManifest()
+            .then((manifest) => {
+                DEBUGMODE && console.log(manifest);
+
+                for (const [key, value] of Object.entries(manifest)) {
+                    if (key === 'photos' || key === 'name') {
+                        continue;
+                    } else {
+                        // Rest goes into Table
+                        const tr = document.createElement('tr');
+
+                        tr.innerHTML = `
+                            <th>${key.replace('_', ' ')}</th>
+                            <td>${value}</td>
+                        `;
+
+                        tbody.appendChild(tr);
+                    }
+                }
+
+                // Append new PhotoForm
+                this.shadowRoot!.appendChild(
+                    new PhotoForm({
+                        name: manifest.name,
+                        landing_date: manifest.landing_date,
+                        max_date: manifest.max_date,
+                        max_sol: manifest.max_sol,
+                    })
+                );
+            })
+            .catch((err) => {
+                console.error(err);
+
+                const info = document.createElement('span');
+                info.textContent = 'Rover Stats not available 😯';
+            });
     }
 
     private async _getManifest() {
@@ -60,14 +111,15 @@ export default class MissionManifest extends HTMLElement {
         const storedManifest = window.sessionStorage.getItem(`${name}-manifest`);
 
         if (storedManifest) {
-            DEBUGMODE && console.log("Returning Manifest from sessionStorage");
+            DEBUGMODE && console.log('Returning Manifest from sessionStorage');
 
             manifest = JSON.parse(storedManifest);
         } else {
-            DEBUGMODE && console.log("Fetching the Manifest from the API");
+            DEBUGMODE && console.log('Fetching the Manifest from the API');
 
             try {
                 manifest = await NasaAPI.fetchManifest(name as RoverName);
+
                 window.sessionStorage.setItem(
                     `${name}-manifest`,
                     JSON.stringify(manifest)
@@ -77,48 +129,12 @@ export default class MissionManifest extends HTMLElement {
             }
         }
 
+        if (!isManifest(manifest)) {
+            throw new Error("NASA-API didn't deliver the requested Manifest.");
+        }
+
         return manifest;
-    }
-
-    private _populateTable() {
-        // create the Heading
-        const h3 = this.shadowRoot!.querySelector("#roverName") as HTMLHeadingElement;
-        h3.textContent = this._roverName;
-
-        // Populate table
-        this._getManifest()
-            .then((manifest) => {
-                DEBUGMODE && console.log(manifest);
-
-                this.shadowRoot!.appendChild(
-                    new PhotoForm({
-                        name: manifest.name,
-                        landing_date: manifest.landing_date,
-                        max_date: manifest.max_date,
-                        max_sol: manifest.max_sol,
-                    })
-                );
-
-                for (const [key, value] of Object.entries(manifest)) {
-                    if (key === "photos" || key === "name") {
-                        continue;
-                    } else {
-                        // Rest goes into Table
-                        const tr = document.createElement("tr");
-                        tr.innerHTML = `
-                            <th>${key.replace("_", " ")}</th>
-                            <td>${value}</td>
-                        `;
-                        this.shadowRoot!.querySelector("tbody")!.appendChild(tr);
-                    }
-                }
-            })
-            .catch((err) => console.error(err));
-    }
-
-    connectedCallback() {
-        this._populateTable();
     }
 }
 
-window.customElements.define("mission-manifest", MissionManifest);
+window.customElements.define('mission-manifest', MissionManifest);

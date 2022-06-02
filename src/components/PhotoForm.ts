@@ -1,7 +1,7 @@
-import { RoverInformation, RoverName } from "../types";
-import { availableCams, cameraDescriptions } from "../globals";
+import { RoverInformation, RoverName } from '../types';
+import { availableCams, cameraDescriptions } from '../globals';
 
-const template = document.createElement("template");
+const template = document.createElement('template');
 template.innerHTML = `
     <style>
         :host {
@@ -83,7 +83,7 @@ export default class PhotoForm extends HTMLElement {
         super();
 
         this._roverInfo = roverInfo;
-        this.attachShadow({ mode: "open" });
+        this.attachShadow({ mode: 'open' });
         this.shadowRoot!.appendChild(template.content.cloneNode(true));
     }
 
@@ -102,56 +102,57 @@ export default class PhotoForm extends HTMLElement {
     disconnectedCallback() {}
 
     private _initForm() {
+        // Initialise the
         this._initDayInput();
 
         // Set min/max values for sol/day input
         const radioGroup = this.shadowRoot!.querySelector(
-            "#radioGroup"
+            '#radioGroup'
         ) as HTMLDivElement;
 
         // Important to bind the Web-Component as "this" to the eventHandler
-        radioGroup.addEventListener("change", this._handleRadio.bind(this));
+        radioGroup.addEventListener('change', this._handleRadio.bind(this));
 
         // Populate Camera-Selector
         const availCams = availableCams[this.name.toLowerCase()];
 
         availCams.forEach((cam) => {
-            const option = document.createElement("option");
+            const option = document.createElement('option');
             option.title = cameraDescriptions[cam];
             option.value = cam;
             option.textContent = cam;
 
-            this.shadowRoot!.querySelector("#cameras")!.appendChild(option);
+            this.shadowRoot!.querySelector('#cameras')!.appendChild(option);
         });
 
         // Important to bind the Web-Component as "this" to the eventHandler
-        (this.shadowRoot!.querySelector("#search") as HTMLInputElement).addEventListener(
-            "click",
+        (this.shadowRoot!.querySelector('#search') as HTMLInputElement).addEventListener(
+            'click',
             this._handleSubmit.bind(this)
         );
     }
 
     private _initDayInput() {
-        const dayInput = this.shadowRoot!.querySelector("#day") as HTMLInputElement;
+        const dayInput = this.shadowRoot!.querySelector('#day') as HTMLInputElement;
 
-        (this.shadowRoot!.querySelector("#bySol") as HTMLInputElement)!.checked = true;
+        (this.shadowRoot!.querySelector('#bySol') as HTMLInputElement)!.checked = true;
 
-        dayInput.type = "number";
+        dayInput.type = 'number';
         dayInput.placeholder = this.rover.max_sol.toString();
-        dayInput.min = "0";
+        dayInput.min = '0';
         dayInput.max = this.rover.max_sol.toString();
     }
 
-    private _changeDayInputType(to: "sol" | "date") {
-        const dayInput = this.shadowRoot!.querySelector("#day") as HTMLInputElement;
+    private _changeDayInputType(to: 'sol' | 'date') {
+        const dayInput = this.shadowRoot!.querySelector('#day') as HTMLInputElement;
 
-        if (to === "date") {
-            dayInput.type = "date";
+        if (to === 'date') {
+            dayInput.type = 'date';
             dayInput.min = this.rover.landing_date;
             dayInput.max = this.rover.max_date;
         } else {
-            dayInput.type = "number";
-            dayInput.min = "0";
+            dayInput.type = 'number';
+            dayInput.min = '0';
             dayInput.max = this.rover.max_sol.toString();
         }
     }
@@ -159,10 +160,10 @@ export default class PhotoForm extends HTMLElement {
     private _handleRadio(e: Event) {
         const clickedElem = e.target as HTMLInputElement;
 
-        if (clickedElem.value === "date") {
-            this._changeDayInputType("date");
+        if (clickedElem.value === 'date') {
+            this._changeDayInputType('date');
         } else {
-            this._changeDayInputType("sol");
+            this._changeDayInputType('sol');
         }
     }
 
@@ -172,4 +173,4 @@ export default class PhotoForm extends HTMLElement {
     }
 }
 
-window.customElements.define("photo-form", PhotoForm);
+window.customElements.define('photo-form', PhotoForm);

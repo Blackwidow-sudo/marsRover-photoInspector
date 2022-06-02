@@ -2,5 +2,6 @@
   "tabWidth": 4,
   "useTabs": false,
   "arrowParens": "always",
-  "printWidth": 90
+  "printWidth": 90,
+  "singleQuote": true
 }

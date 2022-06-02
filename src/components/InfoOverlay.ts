@@ -40,28 +40,26 @@ template.innerHTML = `
     <span>Click anywhere to close this Message</span>
 `;
 
+/**
+ * Displays a Popover with a Message inside. Can be closed with a click anywhere.
+ * @param {string} msg A string or HTMLString that will be presented as the Message
+ */
 export default class InfoOverlay extends HTMLElement {
     private _message: string;
-    private _msgContainer: HTMLDivElement;
+    private _slot: HTMLSlotElement;
 
     constructor(msg?: string) {
         super();
 
         this.attachShadow({ mode: 'open' });
         this.shadowRoot!.appendChild(template.content.cloneNode(true));
-        this._msgContainer = this.shadowRoot!.querySelector(
-            '#msg-container'
-        ) as HTMLDivElement;
+
+        this._slot = this.shadowRoot!.querySelector(
+            'slot[name="message"]'
+        ) as HTMLSlotElement;
 
         if (typeof msg !== 'undefined') {
             this._message = msg;
-
-            const span = document.createElement('span');
-            span.slot = 'message';
-            span.textContent = msg;
-
-            // Slot the custom component
-            this.appendChild(span);
         } else {
             this._message = 'No message';
         }
@@ -76,6 +74,8 @@ export default class InfoOverlay extends HTMLElement {
     }
 
     connectedCallback() {
+        this._slotSelf(this._message);
+        this._slot.addEventListener('slotchange', (e: Event) => console.log(e));
         this.addEventListener('click', this._handleClick.bind(this));
     }
 
@@ -85,6 +85,14 @@ export default class InfoOverlay extends HTMLElement {
 
     private _handleClick() {
         this.remove();
+    }
+
+    private _slotSelf(content: string) {
+        const span = document.createElement('span');
+        span.slot = 'message';
+        span.innerHTML = content;
+
+        this.appendChild(span);
     }
 }
 

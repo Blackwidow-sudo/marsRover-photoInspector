@@ -33,13 +33,13 @@ el_selectRover.addEventListener('change', (e: Event) => {
 const openOverlay = document.querySelector('#openOverlay') as HTMLButtonElement;
 
 openOverlay.addEventListener('click', (e: Event) => {
-    const warn = new MessageOverlay('Hello World');
+    const warn = new MessageOverlay('Hello World from Constructor');
 
-    // const span = document.createElement('span');
-    // span.slot = 'message';
-    // span.textContent = 'Hello World from main.ts';
+    const span = document.createElement('span');
+    span.slot = 'message';
+    span.textContent = 'Hello World from main.ts';
 
-    // warn.appendChild(span);
+    warn.appendChild(span);
 
     document.body.appendChild(warn);
 });

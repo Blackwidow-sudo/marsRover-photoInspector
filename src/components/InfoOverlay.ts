@@ -94,6 +94,20 @@ export default class InfoOverlay extends HTMLElement {
 
         this.appendChild(span);
     }
+
+    public slotWith(element: HTMLElement | string) {
+        if (element instanceof HTMLElement) {
+            element.slot = "message"
+            this.appendChild(element)
+        } else if (typeof element === "string") {
+            const span = document.createElement("span")
+            span.slot = "message"
+            span.innerHTML = element
+            this.appendChild(span)
+        } else {
+            throw new TypeError("element is not of type HTMLElement or string")
+        }
+    }
 }
 
 window.customElements.define('message-overlay', InfoOverlay);
